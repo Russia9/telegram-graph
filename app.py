@@ -3,9 +3,12 @@ import os
 import random
 import re
 
+from dotenv import load_dotenv
 from pyrogram import Client, filters
 from pymongo import MongoClient
 from pyrogram.enums import MessageEntityType
+
+load_dotenv()
 
 # MongoDB connection
 print("Connecting to MongoDB")
