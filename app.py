@@ -26,7 +26,7 @@ url_regex = r"((?:https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9
 tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 
-async def parse(channel_id: str | int, iteration: int):
+async def parse(channel_id, iteration: int):
     # Get Channel Info
     channel_info = await app.get_chat(channel_id)
 
