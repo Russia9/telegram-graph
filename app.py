@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import os
 import random
 import re
@@ -28,10 +29,14 @@ tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 
 async def parse(channel_id, iteration: int):
+    # Delay
+    await asyncio.sleep(5 + random.uniform(0, 4))
+
     # Get Channel Info
     try:
         channel_info = await app.get_chat(channel_id)
     except FloodWait as e:
+        print(f"FloodWait(ChannelInfo): {e.value}")
         await asyncio.sleep(e.value + 1)  # Wait "value" seconds before continuing
         channel_info = await app.get_chat(channel_id)
 
@@ -55,6 +60,7 @@ async def parse(channel_id, iteration: int):
     try:
         history = app.get_chat_history(channel_id, limit=2500)
     except FloodWait as e:
+        print(f"FloodWait(History): {e.value}")
         await asyncio.sleep(e.value + 1)
         history = app.get_chat_history(channel_id, limit=2500)
 
@@ -141,5 +147,7 @@ async def parse(channel_id, iteration: int):
                             "sent_at": message.date,
                         })
 
+
+print("Starting parsing", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z"))
 
 asyncio.get_event_loop().run_until_complete(parse("cat0news", 0))
