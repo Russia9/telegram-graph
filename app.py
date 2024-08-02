@@ -30,7 +30,7 @@ tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 async def parse(channel_id, title, iteration: int):
     # Delay
-    await asyncio.sleep(5 + random.uniform(0, 4))
+    await asyncio.sleep(3 + random.uniform(0, 3))
 
     # Get Channel Info
     try:
@@ -83,7 +83,7 @@ async def parse(channel_id, title, iteration: int):
 
     async for message in history:
         print(f"@{channel_info.username}: {message.id}/{message.date}")
-        await asyncio.sleep(2 + random.uniform(0, 2))
+        await asyncio.sleep(2 + random.uniform(0, 1))
 
         # Check if the message is forwarded
         if message.forward_from_chat:
