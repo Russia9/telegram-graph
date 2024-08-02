@@ -102,8 +102,8 @@ async def parse(channel_id, title, iteration: int):
         return
 
     async for message in history:
-        print(
-            f"{datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z")} @{channel_info.username}: {message.id}/{message.date}")
+        print(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z"),
+              f" @{channel_info.username}: {message.id}/{message.date}")
         await asyncio.sleep(2 + random.uniform(0, 1))
 
         # Check if the message is forwarded
