@@ -191,7 +191,7 @@ async def parse_url(url: str, message: pyrogram.types.Message, iteration: int):
 
         # Parse the source channel
         await parse(channel_info.id, "", iteration + 1)
-    else:
+    elif re.match(url_regex, url):
         # Create Relation in MongoDB
         db.relations.insert_one({
             "channel_id": message.chat.id,
