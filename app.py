@@ -5,7 +5,7 @@ import random
 import re
 
 from dotenv import load_dotenv
-from pyrogram import Client, filters
+from pyrogram import Client
 from pymongo import MongoClient
 from pyrogram.enums import MessageEntityType
 from pyrogram.errors import FloodWait
@@ -28,7 +28,7 @@ url_regex = r"((?:https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9
 tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 
-async def parse(channel_id, iteration: int):
+async def parse(channel_id, title, iteration: int):
     # Delay
     await asyncio.sleep(5 + random.uniform(0, 4))
 
@@ -39,6 +39,20 @@ async def parse(channel_id, iteration: int):
         print(f"FloodWait(ChannelInfo): {e.value}")
         await asyncio.sleep(e.value + 1)  # Wait "value" seconds before continuing
         channel_info = await app.get_chat(channel_id)
+    except Exception as e:  # For example, if the channel is private
+        print(f"Error(ChannelInfo): {e}")
+        # Check if the channel is already in the database
+        if db.channels.find_one({"id": channel_id}):
+            return
+
+        # Create Channel entry in MongoDB
+        db.channels.insert_one({
+            "id": channel_id,
+            "title": title,
+            "username": None,
+            "member_count": 0,
+        })
+        return
 
     # Check if the channel is already in the database
     if db.channels.find_one({"id": channel_info.id}):
@@ -63,6 +77,9 @@ async def parse(channel_id, iteration: int):
         print(f"FloodWait(History): {e.value}")
         await asyncio.sleep(e.value + 1)
         history = app.get_chat_history(channel_id, limit=2500)
+    except Exception as e:
+        print(f"Error(History): {e}")
+        return
 
     async for message in history:
         print(f"@{channel_info.username}: {message.id}/{message.date}")
@@ -81,7 +98,7 @@ async def parse(channel_id, iteration: int):
             })
 
             # Parse the source channel
-            await parse(message.forward_from_chat.id, iteration + 1)
+            await parse(message.forward_from_chat.id, message.forward_from_chat.title, iteration + 1)
         elif message.entities:  # Check if the message contains URL entities
             for entity in message.entities:
                 if entity.type == MessageEntityType.TEXT_LINK:
@@ -102,7 +119,7 @@ async def parse(channel_id, iteration: int):
                         })
 
                         # Parse the source channel
-                        await parse(re.match(tme_regex, entity.url).group(1), iteration + 1)
+                        await parse(re.match(tme_regex, entity.url).group(1), "", iteration + 1)
                     else:
                         # Create Relation in MongoDB
                         db.relations.insert_one({
@@ -134,7 +151,7 @@ async def parse(channel_id, iteration: int):
 
                         # Parse the source channel
                         await parse(
-                            re.match(tme_regex, message.text[entity.offset:entity.offset + entity.length]).group(1),
+                            re.match(tme_regex, message.text[entity.offset:entity.offset + entity.length]).group(1), "",
                             iteration + 1)
                     else:
                         # Create Relation in MongoDB
@@ -150,4 +167,4 @@ async def parse(channel_id, iteration: int):
 
 print("Starting parsing", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z"))
 
-asyncio.get_event_loop().run_until_complete(parse("cat0news", 0))
+asyncio.get_event_loop().run_until_complete(parse("dfsdkfkdkjfs", "", 0))
