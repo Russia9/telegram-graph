@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from pyrogram import Client, filters
 from pymongo import MongoClient
 from pyrogram.enums import MessageEntityType
+from pyrogram.errors import FloodWait
 
 load_dotenv()
 
@@ -28,7 +29,11 @@ tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 async def parse(channel_id, iteration: int):
     # Get Channel Info
-    channel_info = await app.get_chat(channel_id)
+    try:
+        channel_info = await app.get_chat(channel_id)
+    except FloodWait as e:
+        await asyncio.sleep(e.value + 1)  # Wait "value" seconds before continuing
+        channel_info = await app.get_chat(channel_id)
 
     # Check if the channel is already in the database
     if db.channels.find_one({"id": channel_info.id}):
@@ -47,9 +52,15 @@ async def parse(channel_id, iteration: int):
         return
 
     # Go through all messages in the channel
-    async for message in app.get_chat_history(channel_id, limit=2500):
+    try:
+        history = app.get_chat_history(channel_id, limit=2500)
+    except FloodWait as e:
+        await asyncio.sleep(e.value + 1)
+        history = app.get_chat_history(channel_id, limit=2500)
+
+    async for message in history:
         print(f"@{channel_info.username}: {message.id}/{message.date}")
-        await asyncio.sleep(0.5 + random.uniform(0, 2))
+        await asyncio.sleep(2 + random.uniform(0, 2))
 
         # Check if the message is forwarded
         if message.forward_from_chat:
