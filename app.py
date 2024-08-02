@@ -167,4 +167,4 @@ async def parse(channel_id, title, iteration: int):
 
 print("Starting parsing", datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S %Z"))
 
-asyncio.get_event_loop().run_until_complete(parse("dfsdkfkdkjfs", "", 0))
+asyncio.get_event_loop().run_until_complete(parse("cat0news", "", 0))
