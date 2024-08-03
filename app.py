@@ -30,7 +30,7 @@ tme_regex = r"(?:https?:\/\/)?t\.me\/([a-zA-Z0-9_]+)\/?(?:\d+)?"
 
 starting_channel = "cat0news"
 message_limit = 2500
-iteration_limit = 2
+iteration_limit = 1
 
 
 async def parse(channel_id, title, iteration: int):

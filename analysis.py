@@ -1,6 +1,24 @@
+import math
+
 import pandas as pd
 from pyvis.network import Network
 import networkx as nx
+
+
+def orb_size(subs: int):
+    a = 1000000
+    b = 3
+    c = 100
+
+    f = c * (math.atan(subs / a - b) + math.pi / 2)
+    g = subs / 2000
+    h = min(f, g)
+
+    if h < 1:
+        h = 1
+
+    return h
+
 
 relations = pd.read_csv("assets/telegram-graph.relations.csv", sep=",", header=None)
 channels = pd.read_csv("assets/telegram-graph.channels.csv", sep=",", header=None)
@@ -28,7 +46,7 @@ for channel in channels.iterrows():
 
     # print(channel)
     # print(channel[1][1], channel[1][2], size)
-    net.add_node(channel[1][1], label=channel[1][2], size=size)
+    net.add_node(channel[1][1], label=channel[1][2], size=orb_size(int(channel[1][4])))
 
 i = 0
 edge_weights = {}
@@ -47,7 +65,7 @@ for relation in relations.iterrows():
         edge_weights[(relation[1][1], relation[1][5])] = 1
 
 for node in url_nodes:
-    net.add_node(node, label=node, size=10, color="#2b964b")
+    net.add_node(node, label=node, size=5, color="#2b964b")
 
 for edge in edge_weights:
     try:
