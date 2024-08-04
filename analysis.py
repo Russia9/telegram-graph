@@ -46,7 +46,10 @@ for channel in channels.iterrows():
 
     # print(channel)
     # print(channel[1][1], channel[1][2], size)
-    net.add_node(channel[1][1], label=channel[1][2], size=orb_size(int(channel[1][4])))
+    try:
+        net.add_node(channel[1][1], label=channel[1][2], size=orb_size(int(channel[1][4])))
+    except Exception as e:
+        net.add_node(channel[1][1], label=channel[1][2], size=1)
 
 i = 0
 edge_weights = {}
